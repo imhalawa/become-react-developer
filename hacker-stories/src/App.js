@@ -1,14 +1,35 @@
 import './App.css';
-import Wrapper from './Components/Wrapper/Wrapper';
 
+const welcome = {
+	greeting: 'Hi',
+	title: 'React'
+}
 
-const title = 'React'
+function getTitle(title) {
+	return title;
+}
+
+const daysOfWeek = [
+	'Sat',
+	'Sun',
+	'Mon',
+	'Tue',
+	'Wed',
+	'Thu',
+	'Fri'
+]
 
 function App() {
 	return (
-		<Wrapper>
-			<h1> Hello, {title}</h1>
-		</Wrapper>
+		<div>
+			<ul>
+				{
+					daysOfWeek.map(day => {
+						return <li>{day}</li>
+					})
+				}
+			</ul>
+		</div>
 	);
 }
 
