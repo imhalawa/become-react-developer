@@ -1,33 +1,28 @@
 import './App.css';
 
-const list = [
-	{
-		title: 'React',
-		url: 'https://reactjs.org/',
-		author: 'Jordan Walke',
-		num_comments: 3,
-		points: 4,
-		objectID: 0,
-	},
-	{
-		title: 'Redux',
-		url: 'https://redux.js.org/',
-		author: 'Dan Abramov, Andrew Clark',
-		num_comments: 2,
-		points: 5,
-		objectID: 1,
-	},
-];
-
-// Read more about synthetic events: https://reactjs.org/docs/events.html
-
 const App = () => {
+	const stories = [
+		{
+			title: 'React',
+			url: 'https://reactjs.org/',
+			author: 'Jordan Walke',
+			num_comments: 3,
+			points: 4,
+			objectID: 0,
+		},
+		{
+			title: 'Redux',
+			url: 'https://redux.js.org/',
+			author: 'Dan Abramov, Andrew Clark',
+			num_comments: 2,
+			points: 5,
+			objectID: 1,
+		},
+	];
 
-	const handleChange = event =>{
+	const handleChange = event => {
 		console.log(event.target.value);
 	}
-
-
 
 	return (
 		<div>
@@ -35,13 +30,13 @@ const App = () => {
 			<label htmlFor="search">Search: </label>
 			<input onChange={handleChange} id="search" type="text" />
 			<hr />
-			<List />
+			<List items={stories} />
 		</div>
 	);
 }
 
-const List = () =>
-	list.map(item => (
+const List = (props) =>
+	props.items.map(item => (
 		<div key={item.objectID}>
 			<span>
 				<a href={item.url}>{item.title}</a>
