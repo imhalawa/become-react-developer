@@ -22,7 +22,7 @@ const App = () => {
 	];
 
 	// moved the state from Search Component to App, i.e. Lifting Up the State
-	const [searchTerm, setSearchTerm] = React.useState('');
+	const [searchTerm, setSearchTerm] = React.useState('React');
 	const searchResult = stories.filter(story => story.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
 	const handleSearch = event => {
@@ -61,7 +61,7 @@ const Search = (props) => {
 	return (
 		<div>
 			<label htmlFor="search">Search: </label>
-			<input id="search" type="text" onChange={handleChange} />
+			<input id="search" type="text" value={props.searchTerm} onChange={handleChange} />
 
 			<p>
 				Searching for <strong>{props.searchTerm}</strong>
