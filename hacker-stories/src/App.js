@@ -21,18 +21,20 @@ const App = () => {
 		},
 	];
 
+	// moved the state from Search Component to App, i.e. Lifting Up the State
+	const [searchTerm, setSearchTerm] = React.useState('');
+	const searchResult = stories.filter(story => story.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
 	const handleSearch = event => {
-		console.log(event.target.value);
+		setSearchTerm(event.target.value);
 	}
-
 
 	return (
 		<div>
 			<h1>My Hacker Stories</h1>
-			<Search onSearch={handleSearch} />
+			<Search onSearch={handleSearch} searchTerm={searchTerm} />
 			<hr />
-			<List items={stories} />
+			<List items={searchResult} />
 		</div>
 	);
 }
@@ -50,14 +52,10 @@ const List = (props) =>
 	));
 
 const Search = (props) => {
-	const [searchTerm, setSearchTerm] = React.useState('');
 
 	const handleChange = event => {
-		setSearchTerm(event.target.value);
-		
 		// call the callback function provided by the Search component parent
-		// pass parameters to lift it up
-		props.onSearch(event); 
+		props.onSearch(event);
 	}
 
 	return (
@@ -66,7 +64,7 @@ const Search = (props) => {
 			<input id="search" type="text" onChange={handleChange} />
 
 			<p>
-				Searching for <strong>{searchTerm}</strong>.
+				Searching for <strong>{props.searchTerm}</strong>
 			</p>
 		</div>
 	);
