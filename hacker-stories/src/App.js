@@ -30,12 +30,12 @@ const App = () => {
 	}
 
 	return (
-		<div>
+		<>
 			<h1>My Hacker Stories</h1>
 			<Search onSearch={handleSearch} searchTerm={searchTerm} />
 			<hr />
 			<List items={searchResult} />
-		</div>
+		</>
 	);
 }
 
@@ -44,26 +44,26 @@ const List = ({ items }) =>
 	items.map((item) => <ListItem key={item.objectID} item={item} />);
 
 const ListItem = ({ item }) => (
-	<div>
+	<React.Fragment>
 		<span>
 			<a href={item.url}>{item.title}</a>
 		</span>
 		<span>{item.author}</span>
 		<span>{item.num_comments}</span>
 		<span>{item.points}</span>
-	</div>
+	</React.Fragment>
 );
 
 const Search = ({ searchTerm, onSearch }) => {
 	return (
-		<div>
+		<>
 			<label htmlFor="search">Search: </label>
 			<input id="search" type="text" value={searchTerm} onChange={onSearch} />
 
 			<p>
 				Searching for <strong>{searchTerm}</strong>
 			</p>
-		</div>
+		</>
 	);
 }
 
