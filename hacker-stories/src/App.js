@@ -40,17 +40,10 @@ const App = () => {
 }
 
 const List = ({ items }) =>
-	items.map(item => <ListItem key={item.objectID} item={item} />);
+	// Extract objectId on it's Own, Leave the Rest of properties only on Item --> Rest Operator
+	items.map(({ objectId, ...item }) => <ListItem key={item.objectID} {...item} />);
 
-const ListItem = ({
-	item: {
-		title,
-		url,
-		author,
-		num_comments,
-		points
-	}
-}) => (
+const ListItem = ({ title, url, author, num_comments, points }) => (
 	<div>
 		<span>
 			<a href={url}>{title}</a>
