@@ -22,18 +22,12 @@ const App = () => {
 	];
 
 	// moved the state from Search Component to App, i.e. Lifting Up the State
-	const [searchTerm, setSearchTerm] = React.useState(localStorage.getItem('search') || 'React');
+	const [searchTerm, setSearchTerm] = useSemiPersistentState('search','React');
 	const searchResult = stories.filter(story => story.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
 	const handleSearch = event => {
 		setSearchTerm(event.target.value);
 	}
-
-
-	React.useEffect(() => {
-		localStorage.setItem('search', searchTerm);
-	}, [searchTerm]);
-
 
 	return (
 		<div>
@@ -60,7 +54,6 @@ const ListItem = ({ item }) => (
 	</div>
 );
 
-
 const Search = ({ searchTerm, onSearch }) => {
 	return (
 		<div>
@@ -72,6 +65,19 @@ const Search = ({ searchTerm, onSearch }) => {
 			</p>
 		</div>
 	);
+}
+
+// Wrapping around the useState and useEffect!
+const useSemiPersistentState = (key, initialState) => {
+	// define the state
+	const [value, setValue] = React.useState(localStorage.getItem(key) || initialState);
+
+	// setup useEffect
+	React.useEffect(() => {
+		localStorage.setItem(key, value);
+	}, [value, key]);
+
+	return [value, setValue];
 }
 
 export default App;
