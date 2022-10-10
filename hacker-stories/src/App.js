@@ -32,8 +32,12 @@ const App = () => {
 	return (
 		<>
 			<h1>My Hacker Stories</h1>
-			<InputWithLabel id="search" label="Search:" onChange={handleSearch} value={searchTerm} />
-			<InputWithLabel id="search2" label="Search:" type="number" onChange={handleSearch} value={searchTerm} />
+			<InputWithLabel id="search" onChange={handleSearch} value={searchTerm} >
+				Search:
+			</InputWithLabel>
+			<SimpleText>
+				Welcome
+			</SimpleText>
 			<hr />
 			<List items={searchResult} />
 		</>
@@ -55,10 +59,10 @@ const ListItem = ({ item }) => (
 	</React.Fragment>
 );
 
-const InputWithLabel = ({ id, label, type = 'text', value, onChange }) => {
+const InputWithLabel = ({ id, type = 'text', value, onChange, children }) => {
 	return (
 		<>
-			<label htmlFor={id}>{label} </label>
+			<label htmlFor={id}>{children} </label>
 			<input id={id} type={type} value={value} onChange={onChange} />
 
 			<p>
@@ -80,5 +84,12 @@ const useSemiPersistentState = (key, initialState) => {
 
 	return [value, setValue];
 }
+
+const SimpleText = ({ children }) => {
+	return (
+		<InputWithLabel>{children}</InputWithLabel>
+	)
+}
+
 
 export default App;
