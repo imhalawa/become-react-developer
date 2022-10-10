@@ -22,7 +22,7 @@ const App = () => {
 	];
 
 	// moved the state from Search Component to App, i.e. Lifting Up the State
-	const [searchTerm, setSearchTerm] = useSemiPersistentState('search','React');
+	const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
 	const searchResult = stories.filter(story => story.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
 	const handleSearch = event => {
@@ -32,7 +32,8 @@ const App = () => {
 	return (
 		<>
 			<h1>My Hacker Stories</h1>
-			<Search onSearch={handleSearch} searchTerm={searchTerm} />
+			<InputWithLabel id="search" label="Search:" onChange={handleSearch} value={searchTerm} />
+			<InputWithLabel id="search2" label="Search:" type="number" onChange={handleSearch} value={searchTerm} />
 			<hr />
 			<List items={searchResult} />
 		</>
@@ -54,14 +55,14 @@ const ListItem = ({ item }) => (
 	</React.Fragment>
 );
 
-const Search = ({ searchTerm, onSearch }) => {
+const InputWithLabel = ({ id, label, type = 'text', value, onChange }) => {
 	return (
 		<>
-			<label htmlFor="search">Search: </label>
-			<input id="search" type="text" value={searchTerm} onChange={onSearch} />
+			<label htmlFor={id}>{label} </label>
+			<input id={id} type={type} value={value} onChange={onChange} />
 
 			<p>
-				Searching for <strong>{searchTerm}</strong>
+				Searching for <strong>{value}</strong>
 			</p>
 		</>
 	);
