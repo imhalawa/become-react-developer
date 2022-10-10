@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 
 const App = () => {
@@ -22,12 +22,18 @@ const App = () => {
 	];
 
 	// moved the state from Search Component to App, i.e. Lifting Up the State
-	const [searchTerm, setSearchTerm] = React.useState('React');
+	const [searchTerm, setSearchTerm] = React.useState(localStorage.getItem('search') || 'React');
 	const searchResult = stories.filter(story => story.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
 	const handleSearch = event => {
 		setSearchTerm(event.target.value);
 	}
+
+
+	React.useEffect(() => {
+		localStorage.setItem('search', searchTerm);
+	}, [searchTerm]);
+
 
 	return (
 		<div>
@@ -43,7 +49,7 @@ const List = ({ items }) =>
 	// Extract objectId on it's Own, Leave the Rest of properties only on Item --> Rest Operator
 	items.map((item) => <ListItem key={item.objectID} item={item} />);
 
-const ListItem = (item) => (
+const ListItem = ({ item }) => (
 	<div>
 		<span>
 			<a href={item.url}>{item.title}</a>
