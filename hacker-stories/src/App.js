@@ -32,7 +32,7 @@ const App = () => {
 	return (
 		<>
 			<h1>My Hacker Stories</h1>
-			<InputWithLabel id="search" onChange={handleSearch} value={searchTerm} >
+			<InputWithLabel id="search" isFocused onChange={handleSearch} value={searchTerm} >
 				Search:
 			</InputWithLabel>
 			<SimpleText>
@@ -59,11 +59,25 @@ const ListItem = ({ item }) => (
 	</React.Fragment>
 );
 
-const InputWithLabel = ({ id, type = 'text', value, onChange, children }) => {
+const InputWithLabel = ({ id, type = 'text', value, onChange, children, isFocused }) => {
+	const inputRef = React.useRef();
+
+	React.useEffect(() => {
+		if (isFocused && inputRef.current) {
+			inputRef.current.focus();
+		}
+	}, [isFocused])
+
 	return (
 		<>
 			<label htmlFor={id}>{children} </label>
-			<input id={id} type={type} value={value} onChange={onChange} />
+			<input
+				id={id}
+				type={type}
+				value={value}
+				onChange={onChange}
+				ref={inputRef}
+			/>
 
 			<p>
 				Searching for <strong>{value}</strong>
@@ -90,6 +104,5 @@ const SimpleText = ({ children }) => {
 		<InputWithLabel>{children}</InputWithLabel>
 	)
 }
-
 
 export default App;
