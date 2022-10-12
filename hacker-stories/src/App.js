@@ -1,39 +1,51 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 
+const initialStores = [
+	{
+		title: 'React',
+		url: 'https://reactjs.org/',
+		author: 'Jordan Walke',
+		num_comments: 3,
+		points: 4,
+		objectID: 0,
+	},
+	{
+		title: 'Redux',
+		url: 'https://redux.js.org/',
+		author: 'Dan Abramov, Andrew Clark',
+		num_comments: 2,
+		points: 5,
+		objectID: 1,
+	},
+];
+
+// Wrapping around the useState and useEffect!
+const useSemiPersistentState = (key, initialState) => {
+	// define the state
+	const [value, setValue] = React.useState(localStorage.getItem(key) || initialState);
+
+	// setup useEffect
+	React.useEffect(() => {
+		localStorage.setItem(key, value);
+	}, [value, key]);
+
+	return [value, setValue];
+}
+
+const getAsyncStories = () =>
+	new Promise(resolve => {
+		setTimeout(() => {
+			resolve({ data: { stories: initialStores } });
+		}, 2000);
+	});
+
 const App = () => {
-	const initialStores = [
-		{
-			title: 'React',
-			url: 'https://reactjs.org/',
-			author: 'Jordan Walke',
-			num_comments: 3,
-			points: 4,
-			objectID: 0,
-		},
-		{
-			title: 'Redux',
-			url: 'https://redux.js.org/',
-			author: 'Dan Abramov, Andrew Clark',
-			num_comments: 2,
-			points: 5,
-			objectID: 1,
-		},
-	];
-
-	const getAsyncStories = () =>
-		new Promise(resolve => {
-			setTimeout(() => {
-				resolve({ data: { stories: initialStores } });
-			}, 2000);
-		});
-
-
-
 	const [stories, setStories] = React.useState([]);
-
-	// moved the state from Search Component to App, i.e. Lifting Up the State
 	const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
+	const [isLoading, setIsLoading] = React.useState(false);
+	const [isError, setIsError] = React.useState(false);
+
 	const searchResult = stories.filter(story => story.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
 	const handleSearch = event => {
@@ -46,15 +58,18 @@ const App = () => {
 	}
 
 	useEffect(() => {
+		setIsLoading(true);
+
 		// Simulate fetching data
 		getAsyncStories().then(result => {
 			setStories(result.data.stories);
+			setIsLoading(false);
+		}).catch(() => {
+			setIsError(true);
 		});
 
+
 	}, []);
-
-
-
 
 	return (
 		<>
@@ -66,7 +81,8 @@ const App = () => {
 				Welcome
 			</SimpleText>
 			<hr />
-			<List items={searchResult} onRemoveItem={handleRemoveStory} />
+			{isError && <p>Something went wrong ...</p>}
+			{isLoading ? (<p>Loading ... </p>) : (<List items={searchResult} onRemoveItem={handleRemoveStory} />)}
 		</>
 	);
 }
@@ -116,19 +132,6 @@ const InputWithLabel = ({ id, type = 'text', value, onChange, children, isFocuse
 			</p>
 		</React.Fragment>
 	);
-}
-
-// Wrapping around the useState and useEffect!
-const useSemiPersistentState = (key, initialState) => {
-	// define the state
-	const [value, setValue] = React.useState(localStorage.getItem(key) || initialState);
-
-	// setup useEffect
-	React.useEffect(() => {
-		localStorage.setItem(key, value);
-	}, [value, key]);
-
-	return [value, setValue];
 }
 
 const SimpleText = ({ children }) => {
