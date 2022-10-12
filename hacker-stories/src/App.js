@@ -21,7 +21,16 @@ const App = () => {
 		},
 	];
 
-	const [stories, setStories] = React.useState(initialStores);
+	const getAsyncStories = () =>
+		new Promise(resolve => {
+			setTimeout(() => {
+				resolve({ data: { stories: initialStores } });
+			}, 2000);
+		});
+
+
+
+	const [stories, setStories] = React.useState([]);
 
 	// moved the state from Search Component to App, i.e. Lifting Up the State
 	const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
@@ -35,6 +44,17 @@ const App = () => {
 		const newStories = stories.filter(story => story.objectID !== item.objectID);
 		setStories(newStories);
 	}
+
+	useEffect(() => {
+		// Simulate fetching data
+		getAsyncStories().then(result => {
+			setStories(result.data.stories);
+		});
+
+	}, []);
+
+
+
 
 	return (
 		<>
