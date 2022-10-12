@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import './App.css';
 
 const App = () => {
-	const stories = [
+	const initialStores = [
 		{
 			title: 'React',
 			url: 'https://reactjs.org/',
@@ -21,12 +21,19 @@ const App = () => {
 		},
 	];
 
+	const [stories, setStories] = React.useState(initialStores);
+
 	// moved the state from Search Component to App, i.e. Lifting Up the State
 	const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
 	const searchResult = stories.filter(story => story.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
 	const handleSearch = event => {
 		setSearchTerm(event.target.value);
+	}
+
+	const handleRemoveStory = item => {
+		const newStories = stories.filter(story => story.objectID !== item.objectID);
+		setStories(newStories);
 	}
 
 	return (
@@ -39,24 +46,29 @@ const App = () => {
 				Welcome
 			</SimpleText>
 			<hr />
-			<List items={searchResult} />
+			<List items={searchResult} onRemoveItem={handleRemoveStory} />
 		</>
 	);
 }
 
-const List = ({ items }) =>
+const List = ({ items, onRemoveItem }) =>
 	// Extract objectId on it's Own, Leave the Rest of properties only on Item --> Rest Operator
-	items.map((item) => <ListItem key={item.objectID} item={item} />);
+	items.map((item) => <ListItem key={item.objectID} item={item} onRemoveItem={onRemoveItem} />);
 
-const ListItem = ({ item }) => (
-	<React.Fragment>
+const ListItem = ({ item, onRemoveItem }) => (
+	<div>
 		<span>
 			<a href={item.url}>{item.title}</a>
 		</span>
 		<span>{item.author}</span>
 		<span>{item.num_comments}</span>
 		<span>{item.points}</span>
-	</React.Fragment>
+		<span>
+			<button type="button" onClick={() => { onRemoveItem(item) }}>
+				Dismiss
+			</button>
+		</span>
+	</div>
 );
 
 const InputWithLabel = ({ id, type = 'text', value, onChange, children, isFocused }) => {
@@ -69,7 +81,7 @@ const InputWithLabel = ({ id, type = 'text', value, onChange, children, isFocuse
 	}, [isFocused])
 
 	return (
-		<>
+		<React.Fragment>
 			<label htmlFor={id}>{children} </label>
 			<input
 				id={id}
@@ -82,7 +94,7 @@ const InputWithLabel = ({ id, type = 'text', value, onChange, children, isFocuse
 			<p>
 				Searching for <strong>{value}</strong>
 			</p>
-		</>
+		</React.Fragment>
 	);
 }
 
