@@ -40,8 +40,22 @@ const getAsyncStories = () =>
 		}, 2000);
 	});
 
+// Reducer function
+const storiesReducer = (state, action) => {
+	if (action.type === 'SET_STORIES') {
+		return action.payload;
+	}
+	else if (action.type === 'REMOVE_STORY') {
+		return state.filter(story => story.objectID !== action.payload.objectID);
+	}
+	else {
+		throw new Error("UNKnown Action");
+	}
+}
+
+
 const App = () => {
-	const [stories, setStories] = React.useState([]);
+	const [stories, dispatchStories] = React.useReducer(storiesReducer, []);
 	const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [isError, setIsError] = React.useState(false);
@@ -53,8 +67,7 @@ const App = () => {
 	}
 
 	const handleRemoveStory = item => {
-		const newStories = stories.filter(story => story.objectID !== item.objectID);
-		setStories(newStories);
+		dispatchStories({ type: 'REMOVE_STORY', payload: item });
 	}
 
 	useEffect(() => {
@@ -62,7 +75,7 @@ const App = () => {
 
 		// Simulate fetching data
 		getAsyncStories().then(result => {
-			setStories(result.data.stories);
+			dispatchStories({ type: 'SET_STORIES', payload: result.data.stories });
 			setIsLoading(false);
 		}).catch(() => {
 			setIsError(true);
@@ -77,9 +90,6 @@ const App = () => {
 			<InputWithLabel id="search" isFocused onChange={handleSearch} value={searchTerm} >
 				Search:
 			</InputWithLabel>
-			<SimpleText>
-				Welcome
-			</SimpleText>
 			<hr />
 			{isError && <p>Something went wrong ...</p>}
 			{isLoading ? (<p>Loading ... </p>) : (<List items={searchResult} onRemoveItem={handleRemoveStory} />)}
