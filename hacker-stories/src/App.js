@@ -41,31 +41,49 @@ const useSemiPersistentState = (key, initialState) => {
 // 	});
 
 const getAsyncStories = () =>
-	new Promise((resolve,reject) => {
+	new Promise((resolve, reject) => {
 		setTimeout(reject, 2000);
 	});
 
 // Reducer function
+// State is passed by the useReducer Hook
 const storiesReducer = (state, action) => {
-	if (action.type === 'SET_STORIES') {
-		return action.payload;
-	}
-	else if (action.type === 'REMOVE_STORY') {
-		return state.filter(story => story.objectID !== action.payload.objectID);
-	}
-	else {
-		throw new Error("UNKnown Action");
+	switch (action.type) {
+		case 'STORIES_FETCH_INIT':
+			return {
+				...state,
+				isLoading: true,
+				isError: false
+			};
+		case 'STORIES_FETCH_SUCCESS':
+			return {
+				...state,
+				data: action.payload,
+				isLoading: false,
+				isError: false
+			};
+		case 'STORIES_FETCH_ERROR':
+			return {
+				...state,
+				isLoading: false,
+				isError: true
+			};
+		case 'REMOVE_STORY':
+			return {
+				...state,
+				data: state.data.filter(story => story.objectID !== action.payload.objectID)
+			};
+		default:
+			throw new Error("Unknown Action");
 	}
 }
 
 
 const App = () => {
-	const [stories, dispatchStories] = React.useReducer(storiesReducer, []);
+	const [stories, dispatchStories] = React.useReducer(storiesReducer, { data: [], isLoading: false, isError: false });
 	const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
-	const [isLoading, setIsLoading] = React.useState(false);
-	const [isError, setIsError] = React.useState(false);
 
-	const searchResult = stories.filter(story => story.title.toLowerCase().includes(searchTerm.toLowerCase()));
+	const searchResult = stories.data.filter(story => story.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
 	const handleSearch = event => {
 		setSearchTerm(event.target.value);
@@ -76,14 +94,13 @@ const App = () => {
 	}
 
 	useEffect(() => {
-		setIsLoading(true);
+		dispatchStories({ type: "STORIES_FETCH_INIT" });
 
 		// Simulate fetching data
 		getAsyncStories().then(result => {
-			dispatchStories({ type: 'SET_STORIES', payload: result.data.stories });
-			setIsLoading(false);
+			dispatchStories({ type: "STORIES_FETCH_SUCCESS", payload: result.data.stories });
 		}).catch(() => {
-			setIsError(true);
+			dispatchStories({ type: "STORIES_FETCH_ERROR" });
 		});
 
 
@@ -96,8 +113,8 @@ const App = () => {
 				Search:
 			</InputWithLabel>
 			<hr />
-			{isError && <p>Something went wrong ...</p>}
-			{isLoading ? (<p>Loading ... </p>) : (<List items={searchResult} onRemoveItem={handleRemoveStory} />)}
+			{stories.isError && <p>Something went wrong ...</p>}
+			{stories.isLoading ? (<p>Loading ... </p>) : (<List items={searchResult} onRemoveItem={handleRemoveStory} />)}
 		</>
 	);
 }
