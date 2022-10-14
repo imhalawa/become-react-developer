@@ -53,6 +53,7 @@ const storiesReducer = (state, action) => {
 const App = () => {
 	const [stories, dispatchStories] = React.useReducer(storiesReducer, { data: [], isLoading: false, isError: false });
 	const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
+	const [searchUrl, setSearchUrl] = React.useState(`${API_ENDPOINT}${searchTerm}`);
 
 	const handleSearch = event => {
 		setSearchTerm(event.target.value);
@@ -67,7 +68,7 @@ const App = () => {
 
 		dispatchStories({ type: "STORIES_FETCH_INIT" });
 
-		fetch(`${API_ENDPOINT}${searchTerm}`)
+		fetch(searchUrl)
 			.then(response => response.json())
 			.then(result => {
 				dispatchStories({ type: "STORIES_FETCH_SUCCESS", payload: result.hits })
@@ -75,11 +76,13 @@ const App = () => {
 			.catch(() => {
 				dispatchStories({ type: 'STORIES_FETCH_ERROR' })
 			});
-	}, [searchTerm])
+	}, [searchUrl])
 
-	useEffect(() => {
-		handleFetchStories();
-	}, [handleFetchStories]);
+	const handleSearchSubmit = () => {
+		setSearchUrl(`${API_ENDPOINT}${searchTerm}`);
+	}
+
+	useEffect(() => { handleFetchStories(); }, [handleFetchStories]);
 
 	return (
 		<>
@@ -87,6 +90,15 @@ const App = () => {
 			<InputWithLabel id="search" isFocused onChange={handleSearch} value={searchTerm} >
 				<strong>Search: </strong>
 			</InputWithLabel>
+
+			<button
+				type="button"
+				disabled={!searchTerm}
+				onClick={handleSearchSubmit}
+			>
+				Submit
+			</button>
+
 			<hr />
 			{stories.isError && <p>Something went wrong ...</p>}
 			{stories.isLoading ? (<p>Loading ... </p>) : (<List items={stories.data} onRemoveItem={handleRemoveStory} />)}
