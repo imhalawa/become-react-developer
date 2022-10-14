@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import './App.css';
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
@@ -68,10 +69,10 @@ const App = () => {
 
 		dispatchStories({ type: "STORIES_FETCH_INIT" });
 
-		fetch(searchUrl)
-			.then(response => response.json())
+		axios
+			.get(searchUrl)
 			.then(result => {
-				dispatchStories({ type: "STORIES_FETCH_SUCCESS", payload: result.hits })
+				dispatchStories({ type: "STORIES_FETCH_SUCCESS", payload: result.data.hits })
 			})
 			.catch(() => {
 				dispatchStories({ type: 'STORIES_FETCH_ERROR' })
