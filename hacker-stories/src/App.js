@@ -33,11 +33,16 @@ const useSemiPersistentState = (key, initialState) => {
 	return [value, setValue];
 }
 
+// const getAsyncStories = () =>
+// 	new Promise(resolve => {
+// 		setTimeout(() => {
+// 			resolve({ data: { stories: initialStores } });
+// 		}, 2000);
+// 	});
+
 const getAsyncStories = () =>
-	new Promise(resolve => {
-		setTimeout(() => {
-			resolve({ data: { stories: initialStores } });
-		}, 2000);
+	new Promise((resolve,reject) => {
+		setTimeout(reject, 2000);
 	});
 
 // Reducer function
