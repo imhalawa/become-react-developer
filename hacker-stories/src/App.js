@@ -1,24 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 
-const initialStores = [
-	{
-		title: 'React',
-		url: 'https://reactjs.org/',
-		author: 'Jordan Walke',
-		num_comments: 3,
-		points: 4,
-		objectID: 0,
-	},
-	{
-		title: 'Redux',
-		url: 'https://redux.js.org/',
-		author: 'Dan Abramov, Andrew Clark',
-		num_comments: 2,
-		points: 5,
-		objectID: 1,
-	},
-];
+const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
 
 // Wrapping around the useState and useEffect!
 const useSemiPersistentState = (key, initialState) => {
@@ -32,18 +15,6 @@ const useSemiPersistentState = (key, initialState) => {
 
 	return [value, setValue];
 }
-
-// const getAsyncStories = () =>
-// 	new Promise(resolve => {
-// 		setTimeout(() => {
-// 			resolve({ data: { stories: initialStores } });
-// 		}, 2000);
-// 	});
-
-const getAsyncStories = () =>
-	new Promise((resolve, reject) => {
-		setTimeout(reject, 2000);
-	});
 
 // Reducer function
 // State is passed by the useReducer Hook
@@ -83,8 +54,6 @@ const App = () => {
 	const [stories, dispatchStories] = React.useReducer(storiesReducer, { data: [], isLoading: false, isError: false });
 	const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
 
-	const searchResult = stories.data.filter(story => story.title.toLowerCase().includes(searchTerm.toLowerCase()));
-
 	const handleSearch = event => {
 		setSearchTerm(event.target.value);
 	}
@@ -93,28 +62,34 @@ const App = () => {
 		dispatchStories({ type: 'REMOVE_STORY', payload: item });
 	}
 
-	useEffect(() => {
+	const handleFetchStories = React.useCallback(() => {
+		if (!searchTerm) return;
+
 		dispatchStories({ type: "STORIES_FETCH_INIT" });
 
-		// Simulate fetching data
-		getAsyncStories().then(result => {
-			dispatchStories({ type: "STORIES_FETCH_SUCCESS", payload: result.data.stories });
-		}).catch(() => {
-			dispatchStories({ type: "STORIES_FETCH_ERROR" });
-		});
+		fetch(`${API_ENDPOINT}${searchTerm}`)
+			.then(response => response.json())
+			.then(result => {
+				dispatchStories({ type: "STORIES_FETCH_SUCCESS", payload: result.hits })
+			})
+			.catch(() => {
+				dispatchStories({ type: 'STORIES_FETCH_ERROR' })
+			});
+	}, [searchTerm])
 
-
-	}, []);
+	useEffect(() => {
+		handleFetchStories();
+	}, [handleFetchStories]);
 
 	return (
 		<>
 			<h1>My Hacker Stories</h1>
 			<InputWithLabel id="search" isFocused onChange={handleSearch} value={searchTerm} >
-				Search:
+				<strong>Search: </strong>
 			</InputWithLabel>
 			<hr />
 			{stories.isError && <p>Something went wrong ...</p>}
-			{stories.isLoading ? (<p>Loading ... </p>) : (<List items={searchResult} onRemoveItem={handleRemoveStory} />)}
+			{stories.isLoading ? (<p>Loading ... </p>) : (<List items={stories.data} onRemoveItem={handleRemoveStory} />)}
 		</>
 	);
 }
