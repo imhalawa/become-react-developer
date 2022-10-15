@@ -64,23 +64,19 @@ const App = () => {
 		dispatchStories({ type: 'REMOVE_STORY', payload: item });
 	}
 
-	const handleFetchStories = React.useCallback(() => {
-		if (!searchTerm) return;
-
+	const handleFetchStories = React.useCallback(async () => {
 		dispatchStories({ type: "STORIES_FETCH_INIT" });
-
-		axios
-			.get(searchUrl)
-			.then(result => {
-				dispatchStories({ type: "STORIES_FETCH_SUCCESS", payload: result.data.hits })
-			})
-			.catch(() => {
-				dispatchStories({ type: 'STORIES_FETCH_ERROR' })
-			});
+		try {
+			const result = await axios.get(searchUrl);
+			dispatchStories({ type: "STORIES_FETCH_SUCCESS", payload: result.data.hits });
+		} catch {
+			dispatchStories({ type: 'STORIES_FETCH_ERROR' });
+		}
 	}, [searchUrl])
 
-	const handleSearchSubmit = () => {
+	const handleSearchSubmit = (event) => {
 		setSearchUrl(`${API_ENDPOINT}${searchTerm}`);
+		event.preventDefault();
 	}
 
 	useEffect(() => { handleFetchStories(); }, [handleFetchStories]);
@@ -88,17 +84,16 @@ const App = () => {
 	return (
 		<>
 			<h1>My Hacker Stories</h1>
-			<InputWithLabel id="search" isFocused onChange={handleSearch} value={searchTerm} >
-				<strong>Search: </strong>
-			</InputWithLabel>
+			<form onSubmit={handleSearchSubmit}>
 
-			<button
-				type="button"
-				disabled={!searchTerm}
-				onClick={handleSearchSubmit}
-			>
-				Submit
-			</button>
+				<InputWithLabel id="search" isFocused onChange={handleSearch} value={searchTerm} >
+					<strong>Search: </strong>
+				</InputWithLabel>
+
+				<button type="submit" disabled={!searchTerm} >
+					Submit
+				</button>
+			</form>
 
 			<hr />
 			{stories.isError && <p>Something went wrong ...</p>}
