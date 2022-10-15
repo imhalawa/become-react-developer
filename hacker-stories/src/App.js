@@ -86,8 +86,8 @@ const App = () => {
 		<>
 			<h1>My Hacker Stories</h1>
 			<form onSubmit={handleSearchSubmit}>
-				<Input value='text' />
-				<InputWithLabel id="search" isFocused onChange={handleSearch} value={searchTerm} >
+				<Input isFocused value='text' />
+				<InputWithLabel id="search" onChange={handleSearch} value={searchTerm} >
 					<strong>Search: </strong>
 				</InputWithLabel>
 
