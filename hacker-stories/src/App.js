@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Input from './Input';
-import './App.css';
+import styles from './App.module.css';
+import cs from 'classnames'
+import {ReactComponent as Check} from './check.svg';
+
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
 
@@ -57,9 +59,7 @@ const App = () => {
 	const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React');
 	const [searchUrl, setSearchUrl] = React.useState(`${API_ENDPOINT}${searchTerm}`);
 
-	const handleSearch = event => {
-		setSearchTerm(event.target.value);
-	}
+
 
 	const handleRemoveStory = item => {
 		dispatchStories({ type: 'REMOVE_STORY', payload: item });
@@ -75,6 +75,10 @@ const App = () => {
 		}
 	}, [searchUrl])
 
+	const handleSearchTerm = event => {
+		setSearchTerm(event.target.value);
+	}
+
 	const handleSearchSubmit = (event) => {
 		setSearchUrl(`${API_ENDPOINT}${searchTerm}`);
 		event.preventDefault();
@@ -83,23 +87,16 @@ const App = () => {
 	useEffect(() => { handleFetchStories(); }, [handleFetchStories]);
 
 	return (
-		<>
-			<h1>My Hacker Stories</h1>
-			<form onSubmit={handleSearchSubmit}>
-				<Input isFocused value='text' />
-				<InputWithLabel id="search" onChange={handleSearch} value={searchTerm} >
-					<strong>Search: </strong>
-				</InputWithLabel>
+		<div className={styles.container}>
+			<h1 className={styles.headlinePrimary}>My Hacker Stories</h1>
 
-				<button type="submit" disabled={!searchTerm} >
-					Submit
-				</button>
-			</form>
+			<SearchForm onSearchInput={handleSearchTerm} onSubmit={handleSearchSubmit} searchTerm={searchTerm}
+				className={styles['button_large']}
+			/>
 
-			<hr />
 			{stories.isError && <p>Something went wrong ...</p>}
 			{stories.isLoading ? (<p>Loading ... </p>) : (<List items={stories.data} onRemoveItem={handleRemoveStory} />)}
-		</>
+		</div>
 	);
 }
 
@@ -108,16 +105,16 @@ const List = ({ items, onRemoveItem }) =>
 	items.map((item) => <ListItem key={item.objectID} item={item} onRemoveItem={onRemoveItem} />);
 
 const ListItem = ({ item, onRemoveItem }) => (
-	<div>
-		<span>
+	<div className={styles.item}>
+		<span style={{ width: '40%' }}>
 			<a href={item.url}>{item.title}</a>
 		</span>
-		<span>{item.author}</span>
-		<span>{item.num_comments}</span>
-		<span>{item.points}</span>
-		<span>
-			<button type="button" onClick={() => { onRemoveItem(item) }}>
-				Dismiss
+		<span style={{ width: '30%' }}>{item.author}</span>
+		<span style={{ width: '10%' }}>{item.num_comments}</span>
+		<span style={{ width: '10%' }}>{item.points}</span>
+		<span style={{ width: '10%' }}>
+			<button type="button" className={cs(styles.button,styles.button_small)} onClick={() => { onRemoveItem(item) }}>
+				<Check height="18px" width="18px"/>
 			</button>
 		</span>
 	</div>
@@ -134,26 +131,34 @@ const InputWithLabel = ({ id, type = 'text', value, onChange, children, isFocuse
 
 	return (
 		<React.Fragment>
-			<label htmlFor={id}>{children} </label>
+			<label htmlFor={id} className={styles.label}>{children} </label>
 			<input
 				id={id}
 				type={type}
 				value={value}
 				onChange={onChange}
 				ref={inputRef}
-			/>
+				className={styles.input}
 
-			<p>
-				Searching for <strong>{value}</strong>
-			</p>
+			/>
 		</React.Fragment>
 	);
 }
 
-const SimpleText = ({ children }) => {
+const SearchForm = ({ onSearchTermChanged, onSubmit, searchTerm, className }) => {
+
 	return (
-		<InputWithLabel>{children}</InputWithLabel>
-	)
+		<form onSubmit={(event => onSubmit(event))} className={styles['search-form']}>
+			<InputWithLabel id="search" onChange={(event) => onSearchTermChanged(event)} value={searchTerm} >
+				<strong>Search: </strong>
+			</InputWithLabel>
+
+			<button type="submit" disabled={!searchTerm} className={cs(styles.button,className)} >
+				Submit
+			</button>
+		</form>
+	);
 }
+
 
 export default App;
