@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import Input from './Input';
 import './App.css';
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
@@ -85,7 +86,7 @@ const App = () => {
 		<>
 			<h1>My Hacker Stories</h1>
 			<form onSubmit={handleSearchSubmit}>
-
+				<Input value='text' />
 				<InputWithLabel id="search" isFocused onChange={handleSearch} value={searchTerm} >
 					<strong>Search: </strong>
 				</InputWithLabel>
