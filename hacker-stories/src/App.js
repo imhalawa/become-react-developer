@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import styles from './App.module.css';
 import cs from 'classnames'
-import {ReactComponent as Check} from './check.svg';
+import { ReactComponent as Check } from './check.svg';
 
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
@@ -113,8 +113,8 @@ const ListItem = ({ item, onRemoveItem }) => (
 		<span style={{ width: '10%' }}>{item.num_comments}</span>
 		<span style={{ width: '10%' }}>{item.points}</span>
 		<span style={{ width: '10%' }}>
-			<button type="button" className={cs(styles.button,styles.button_small)} onClick={() => { onRemoveItem(item) }}>
-				<Check height="18px" width="18px"/>
+			<button type="button" className={cs(styles.button, styles.button_small)} onClick={() => { onRemoveItem(item) }}>
+				<Check height="18px" width="18px" />
 			</button>
 		</span>
 	</div>
@@ -153,7 +153,7 @@ const SearchForm = ({ onSearchTermChanged, onSubmit, searchTerm, className }) =>
 				<strong>Search: </strong>
 			</InputWithLabel>
 
-			<button type="submit" disabled={!searchTerm} className={cs(styles.button,className)} >
+			<button type="submit" disabled={!searchTerm} className={cs(styles.button, className)} >
 				Submit
 			</button>
 		</form>
@@ -162,3 +162,4 @@ const SearchForm = ({ onSearchTermChanged, onSubmit, searchTerm, className }) =>
 
 
 export default App;
+export { SearchForm, InputWithLabel, List, ListItem };
